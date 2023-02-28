@@ -4,14 +4,15 @@
 <!-- raw special text {{ '{{' }} {{'}}'}} {{ '{%' }} {{ '%}' }}-->
 
 {% for aval in bigul %}
-<ul {{ css.color }}>
-{% for user in users %}
-  <li><a href="{{ user.url }}">{{ aval }} {{ user.username }}</a></li>{% endfor %}
-</ul>
+{{ aval }} avalhhh
 {% endfor %}
 <div>
 {% block body %}
 	I'm parent block  {% endblock %}
+{% if show %}
+	I'm show {% endif %}
+{% if notShow %}
+	I'm not show {% endif %}
 </div>
 </body>
 </html>

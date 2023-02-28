@@ -8,6 +8,7 @@ local NODE_FOR = 2
 local NODE_EXPR = 3
 local NODE_BLOCK = 4
 local NODE_RAW = 5
+local NODE_IF = 6
 
 ast_node = {
 	node_type = NODE_BLOCK, 
@@ -95,10 +96,10 @@ local function parse_instr(s)
 		end
 
 		table.insert(arglist, arr_token[nf])
-	elseif cmd == "endfor" or cmd == "endblock" then
+	elseif cmd == "endfor" or cmd == "endblock" or cmd == "endif" then
 		--no param
 		if nf > 1 then return "",{} end
-	elseif cmd == "extend" or cmd == "block" then
+	elseif cmd == "extend" or cmd == "block" or cmd == "if" then
 		--only 1 param
 		if nf > 2 then return "",{} end 
 		table.insert(arglist, arr_token[2])
@@ -206,6 +207,18 @@ function lutem:parse_file(filename, path)
 					end
 					table.remove(bstack)	
 					cur_parent = bstack[#bstack]
+				elseif cmd == "if" then
+					node = new_ast_node(NODE_IF, cur_parent, arglist[1])
+					self.blocks_[arglist[1]] = node
+					table.insert(cur_parent.child_, node)
+					cur_parent = node
+					table.insert(bstack, node)
+				elseif cmd == "endif" then
+					if #bstack < 1 or bstack[#bstack].node_type ~= NODE_IF then
+						return -1, "endif syntax error "..cur_lno 
+					end
+					table.remove(bstack)	
+					cur_parent = bstack[#bstack]
 				elseif cmd == "block" then
 					if self.blocks_[arglist[1]] ~= nil then
 						node = self.blocks_[arglist[1]]
@@ -300,6 +313,8 @@ function lutem:render_node(node)
 		table.insert(self.output_, node.content)
 	elseif node.node_type == NODE_EXPR then
 		table.insert(self.output_, self:get_expr_val(node.content))
+	elseif node.node_type == NODE_IF then
+		self:render_if(node)
 	elseif node.node_type == NODE_BLOCK then
 		self:render_block(node)
 	elseif node.node_type == NODE_FOR then
@@ -312,6 +327,14 @@ end
 function lutem:render_block(block)
 	for _, node in ipairs(block.child_) do
 		self:render_node(node)
+	end
+end
+
+function lutem:render_if(block)
+	if self.args_[block.content] then
+		for _, node in ipairs(block.child_) do
+			self:render_node(node)
+		end
 	end
 end
 

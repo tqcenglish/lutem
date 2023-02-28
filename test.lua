@@ -4,7 +4,7 @@ require "lutem"
 
 tmpl = lutem:new()
 ret,errmsg = tmpl:load("test_sub.tmpl", "./")
-args = {}
+args = {show= true, notShow=false}
 args.bigul = {1,2,3}
 args.users = {
 	{username="linlu", url="/#1"}, 
