@@ -331,7 +331,7 @@ function lutem:render_block(block)
 end
 
 function lutem:render_if(block)
-	if self.args_[block.content] then
+	if self:get_expr_val(block.content) == 'true' then
 		for _, node in ipairs(block.child_) do
 			self:render_node(node)
 		end

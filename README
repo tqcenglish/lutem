@@ -16,6 +16,12 @@ Loop generate:
 ...  --this area would be repeated
 {% endfor %}
 
+if generate
+
+{% if show %}
+... --this area would be repeated
+{% endfor %}
+
 variable replacement:
 {{ variable/raw }}
 variable example: {{ xxx }} {{ tbl.v }}
@@ -41,3 +47,5 @@ Example
 See the test.lua and test.tmpl
 
 
+##
+2023-2 添加 if 条件
